@@ -2,7 +2,7 @@ name: sampleapp
 environment: dev
 python_version: "3.11"
 
-repo: https://github.com/yourusername/sampleapp.git
+repo: https://github.com/unomena/deployment-tool-sample-app.git
 
 dependencies:
   system:
@@ -81,7 +81,7 @@ hooks:
       description: "Creating Django superuser"
       allow_failure: true
     
-    - command: "python src/run_tests.py --health-check"
+    - script: "run-unit-tests.sh"
       description: "Running unit tests and health check validation"
       allow_failure: false
 
