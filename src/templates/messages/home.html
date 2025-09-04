@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Sample App - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Welcome Section -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title text-primary">
+                    <i class="fas fa-rocket me-2"></i>
+                    Hey, the sample app is working!
+                </h1>
+                <p class="card-text lead">
+                    This Django application demonstrates Celery task processing with PostgreSQL and Redis.
+                </p>
+            </div>
+        </div>
+
+        <!-- Message Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    Send a Message
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.content.label_tag }}
+                        {{ form.content }}
+                        <div class="form-text">
+                            Type your message and click the button to kick off a Celery task!
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-play me-2"></i>
+                        Click here to kick off a task
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Messages List -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    All Messages
+                </h3>
+                <span class="badge bg-primary">{{ total_messages }} total</span>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    <div class="row">
+                        {% for message in messages %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card message-card h-100">
+                                    <div class="card-body">
+                                        <p class="card-text">{{ message.content }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ message.created_at|date:"M d, Y H:i" }}
+                                            </small>
+                                            {% if message.processed_at %}
+                                                <span class="badge bg-success status-badge">
+                                                    <i class="fas fa-check me-1"></i>Processed
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning status-badge">
+                                                    <i class="fas fa-clock me-1"></i>Pending
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        {% if message.processed_at %}
+                                            <small class="text-success d-block mt-1">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                Processed: {{ message.processed_at|date:"M d, Y H:i" }}
+                                            </small>
+                                        {% endif %}
+                                        {% if message.task_id %}
+                                            <small class="text-info d-block mt-1">
+                                                <i class="fas fa-cog me-1"></i>
+                                                Task: {{ message.task_id|truncatechars:12 }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No messages yet. Send your first message above!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Stats Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-primary">{{ total_messages }}</h4>
+                            <small class="text-muted">Total Messages</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success">{{ processed_messages }}</h4>
+                        <small class="text-muted">Processed</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Tasks -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tasks me-2"></i>
+                    Recent Tasks
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_tasks %}
+                    {% for task in recent_tasks %}
+                        <div class="d-flex justify-content-between align-items-start mb-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="flex-grow-1">
+                                <small class="task-log d-block">{{ task.task_name }}</small>
+                                <small class="text-muted">{{ task.started_at|date:"H:i:s" }}</small>
+                            </div>
+                            <span class="badge bg-{% if task.status == 'SUCCESS' %}success{% elif task.status == 'FAILURE' %}danger{% elif task.status == 'STARTED' %}info{% else %}secondary{% endif %}">
+                                {{ task.status }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">No tasks yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh the page every 30 seconds to show updated task status
+    setTimeout(function() {
+        location.reload();
+    }, 30000);
+</script>
+{% endblock %}

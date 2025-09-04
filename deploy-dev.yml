@@ -1,0 +1,112 @@
+name: sampleapp
+environment: dev
+python_version: "3.11"
+
+repo: https://github.com/yourusername/sampleapp.git
+
+dependencies:
+  system:
+    - postgresql-client
+    - redis-tools
+    - git
+    - curl
+  
+  python-requirements:
+    - requirements.txt
+
+env_vars:
+  DJANGO_SETTINGS_MODULE: "sampleapp.settings"
+  SECRET_KEY: "django-insecure-dev-key-change-in-production"
+  DEBUG: "True"
+  ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+  
+  # Database configuration (application credentials)
+  DB_NAME: "sampleapp_dev"
+  DB_USER: "sampleapp_user"
+  DB_PASSWORD: "sampleapp_password"
+  DB_HOST: "localhost"
+  DB_PORT: "5432"
+  
+  # Redis configuration
+  REDIS_URL: "redis://localhost:6379/0"
+  
+  # Superuser configuration
+  DEFAULT_SUPERUSER_USERNAME: "admin"
+  DEFAULT_SUPERUSER_PASSWORD: "admin123"
+  DEFAULT_SUPERUSER_EMAIL: "admin@sampleapp.local"
+
+database:
+  type: postgresql
+  name: ${DB_NAME}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  host: ${DB_HOST}
+  port: ${DB_PORT}
+
+services:
+  - name: web
+    type: gunicorn
+    command: "gunicorn sampleapp.wsgi:application"
+    workers: 2
+    port: 8000
+    directory: src
+
+  - name: worker
+    type: celery
+    command: "celery -A sampleapp worker -l info"
+    workers: 2
+    directory: src
+
+  - name: beat
+    type: celery
+    command: "celery -A sampleapp beat -l info"
+    directory: src
+
+hooks:
+  pre_deploy:
+    - script: "verify-postgresql-database.sh"
+      description: "Verifying PostgreSQL database and creating if not exists"
+      allow_failure: false
+
+  post_deploy:
+    - script: "validate-django-environment.sh"
+      description: "Validating Django environment and database connection"
+      allow_failure: false
+    
+    - script: "run-django-migrations.sh"
+      description: "Running Django database migrations"
+      allow_failure: false
+    
+    - script: "create-django-superuser.sh"
+      description: "Creating Django superuser"
+      allow_failure: true
+    
+    - command: "python src/run_tests.py --health-check"
+      description: "Running unit tests and health check validation"
+      allow_failure: false
+
+health_checks:
+  - name: web_health
+    url: "http://localhost:8000/"
+    timeout: 30
+    retries: 3
+    
+  - name: comprehensive_health
+    url: "http://localhost:8000/health/"
+    timeout: 15
+    retries: 3
+    
+  - name: readiness_probe
+    url: "http://localhost:8000/health/readiness/"
+    timeout: 10
+    retries: 2
+    
+  - name: liveness_probe
+    url: "http://localhost:8000/health/liveness/"
+    timeout: 5
+    retries: 2
+
+rollback:
+  enabled: true
+  keep_releases: 3
+  health_check_timeout: 60
