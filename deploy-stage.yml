@@ -81,8 +81,8 @@ hooks:
       description: "Creating Django superuser"
       allow_failure: true
     
-    - command: "python src/run_tests.py --categories --health-check"
-      description: "Running comprehensive unit tests and health check validation"
+    - script: "run-unit-tests.sh"
+      description: "Running unit tests and health check validation"
       allow_failure: false
 
 health_checks:
