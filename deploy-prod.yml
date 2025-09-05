@@ -46,7 +46,7 @@ database:
 services:
   - name: web
     type: gunicorn
-    command: "gunicorn sampleapp.wsgi:application"
+    command: "gunicorn sampleapp.wsgi:application --timeout 120 --keep-alive 5 --max-requests 1000 --max-requests-jitter 100"
     workers: 2
     port: 8000
     directory: src
