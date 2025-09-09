@@ -1,5 +1,4 @@
 name: sampleapp
-environment: dev
 python_version: "3.11"
 
 repo: https://github.com/unomena/deployment-tool-sample-app.git
@@ -21,8 +20,8 @@ env_vars:
   ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
   
   # Database configuration (application credentials)
-  DB_NAME: "sampleapp_dev"
-  DB_USER: "sampleapp_user"
+  DB_NAME: "${PROJECT_NAME}-${NORMALIZED_BRANCH}"
+  DB_USER: "${PROJECT_NAME}-${NORMALIZED_BRANCH}"
   DB_PASSWORD: "sampleapp_password"
   DB_HOST: "localhost"
   DB_PORT: "5432"

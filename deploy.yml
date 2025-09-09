@@ -1,7 +1,7 @@
 name: sampleapp
 python_version: "3.11"
 
-repo: https://github.com/yourusername/sampleapp.git
+repo: https://github.com/unomena/deployment-tool-sample-app.git
 
 dependencies:
   system:
@@ -15,8 +15,8 @@ dependencies:
 
 env_vars:
   DJANGO_SETTINGS_MODULE: "sampleapp.settings"
-  SECRET_KEY: "django-insecure-dev-key-change-in-production"
-  DEBUG: "False"
+  SECRET_KEY: "django-insecure-default-key-change-in-production"
+  DEBUG: "True"
   ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
   
   # Database configuration (application credentials)
@@ -79,6 +79,10 @@ hooks:
     - script: "create-django-superuser.sh"
       description: "Creating Django superuser"
       allow_failure: true
+    
+    - script: "run-unit-tests.sh"
+      description: "Running unit tests and health check validation"
+      allow_failure: false
 
 health_checks:
   - name: web_health
