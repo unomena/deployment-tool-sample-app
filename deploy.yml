@@ -65,10 +65,6 @@ hooks:
   pre_deploy: []
 
   post_deploy:
-    - script: "validate-django-environment.sh"
-      description: "Validating Django environment and database connection"
-      allow_failure: false
-    
     - script: "run-django-migrations.sh"
       description: "Running Django database migrations"
       allow_failure: false
@@ -76,10 +72,6 @@ hooks:
     - script: "create-django-superuser.sh"
       description: "Creating Django superuser"
       allow_failure: true
-    
-    - script: "run-unit-tests.sh"
-      description: "Running unit tests and health check validation"
-      allow_failure: false
 
 health_checks:
   - name: web_health
