@@ -20,8 +20,8 @@ env_vars:
   ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
   
   # Database configuration (application credentials)
-  DB_NAME: "${PROJECT_NAME}-${NORMALIZED_BRANCH}"
-  DB_USER: "${PROJECT_NAME}-${NORMALIZED_BRANCH}"
+  DB_NAME: "sampleapp-main"
+  DB_USER: "sampleapp-main"
   DB_PASSWORD: "sampleapp_password"
   DB_HOST: "localhost"
   DB_PORT: "5432"
@@ -36,11 +36,11 @@ env_vars:
 
 database:
   type: postgresql
-  name: ${DB_NAME}
-  user: ${DB_USER}
-  password: ${DB_PASSWORD}
-  host: ${DB_HOST}
-  port: ${DB_PORT}
+  name: "sampleapp-main"
+  user: "sampleapp-main"
+  password: "sampleapp_password"
+  host: "localhost"
+  port: "5432"
 
 services:
   - name: web
