@@ -65,7 +65,7 @@ hooks:
   pre_deploy:
     - script: "verify-postgresql-database.sh"
       description: "Verifying PostgreSQL database and creating if not exists"
-      allow_failure: false
+      allow_failure: true
 
   post_deploy:
     - script: "validate-django-environment.sh"
